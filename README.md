@@ -1,4 +1,4 @@
-# Online Movie Ticket Booking System - FrontEnd
+# Online Movie Ticket Booking System - BackEnd
 
 MERN Stack has been used for this entire project<br/>
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -31,14 +31,13 @@ MERN Stack has been used for this entire project<br/>
 - [About](#about)
 - [Technologies](#technologies)
 - [Getting Started](#getting-started)
-- [Backend Repository](#backend-repository)
-- [Project Structure](#project-structure)
-- [Features](#features)
-- [Screenshots](#screenshots)
+- [Frontend Repository](#frontend-repository)
+- [API Documentation](#api-documentation)
 - [Contact](#contact)
 
 ## About
 
+This is only backend
 Seats can be reserved online for watching movies. <br/>
 Movies can be added from the admin panel.
 
@@ -49,16 +48,16 @@ Movies can be added from the admin panel.
 - Database: MongoDB Atlas
 - Jwt, Axios, Render, Aws
 
-## Getting Started With Frontend
+## Getting Started With Backend
 
 Provide instructions on how to set up and run project locally.
 
 ```bash
 # Clone the repository
-git clone https://github.com/shamodhaSahan/Online_Movie_Ticket_Booking_FrontEnd.git
+git clone https://github.com/shamodhaSahan/Online_Movie_Ticket_Booking_BackEnd.git
 
 # Change into the project directory
-cd movie-reservation-frontend
+cd movie-reservation-backend
 
 # Install frontend dependencies
 npm install
@@ -67,15 +66,11 @@ npm install
 npm run dev
 ```
 
-## Backend Repository
+## Frontend Repository
 
-- Backend Repository: [Backend Repo](https://github.com/shamodhaSahan/Online_Movie_Ticket_Booking_BackEnd)
+- Frontend Repository: [Backend Repo](https://github.com/shamodhaSahan/Online_Movie_Ticket_Booking_FrontEnd)
 
-## Project Structure
-
-## Features
-
-## Screenshots
+## API Documentation
 
 ## Contact
 
