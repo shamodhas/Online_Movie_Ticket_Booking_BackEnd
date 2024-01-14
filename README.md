@@ -63,7 +63,7 @@ cd movie-reservation-backend
 npm install
 
 # Start the frontend development server
-npm run dev
+npm start
 ```
 
 ## Frontend Repository
