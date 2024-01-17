@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2016",
     "module": "NodeNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "NodeNext",
     "baseUrl": "src",
     "sourceMap": true,
     "outDir": "dist",
