@@ -2,11 +2,13 @@ class CustomResponse {
   private _status: number;
   private _message: string;
   private _data?: any;
+  private _pageCount?: number;
 
-  constructor(status: number, message: string, data: any) {
+  constructor(status: number, message: string, data: any, pageCount: number) {
     this._status = status;
     this._message = message;
     this._data = data;
+    this._pageCount = pageCount;
   }
 
   public get status(): number {
@@ -32,6 +34,15 @@ class CustomResponse {
   public set data(data: any) {
     this._data = data;
   }
+
+  public get pageCount(): number | undefined {
+    return this._pageCount;
+  }
+
+  public set pageCount(value: number | undefined) {
+    this._pageCount = value;
+  }
+
   toJSON() {
     return {
       status: this._status,
