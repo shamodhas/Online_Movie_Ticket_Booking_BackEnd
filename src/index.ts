@@ -4,11 +4,17 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import * as process from "process";
 import UserRoutes from "./routes/user.routes";
+import cors from "cors";
 
 dotenv.config();
 const port = 8080;
 const app = express();
 
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(bodyParser.json());
 app.use("/user", UserRoutes);
 

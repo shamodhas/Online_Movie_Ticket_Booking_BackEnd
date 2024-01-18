@@ -1,10 +1,10 @@
-class CustomResponse {
+export default class CustomResponse {
   private _status: number;
   private _message: string;
   private _data?: any;
   private _pageCount?: number;
 
-  constructor(status: number, message: string, data: any, pageCount: number) {
+  constructor(status: number, message: string, data?: any, pageCount?: number) {
     this._status = status;
     this._message = message;
     this._data = data;
