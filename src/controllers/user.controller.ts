@@ -121,12 +121,13 @@ export const updateUser = async (
   try {
     const req_body: any = req.body;
     const userId = req.params.id;
-    try {
+    const validationRegex = new RegExp("^[0-9a-fA-F]{24}$");
+
+    if (validationRegex.test(userId)) {
       const exUser: SchemaTypes.IUser | null = await UserModel.findById(userId);
-      console.log(exUser)
-      if (!exUser) {
-        throw new Error("User not found");
-      }
+
+      if (!exUser)
+        return res.status(400).send(new CustomResponse(400, "User not found"));
 
       exUser.name = req_body.name || exUser.name;
       exUser.email = req_body.email || exUser.email;
@@ -143,19 +144,14 @@ export const updateUser = async (
 
       if (updateResult.modifiedCount > 0) {
         exUser.password = "";
-        console.log(exUser);
-        res
-          .status(200)
-          .send(new CustomResponse(200, "User updated successfully", exUser));
+        res.status(200).send(new CustomResponse(200, "User updated", exUser));
       } else {
         res.status(400).send(new CustomResponse(400, "Fail to update user"));
       }
-    } catch (err) {
-      console.log(err)
-      res.status(404).send(new CustomResponse(404, "User not found"));
+    } else {
+      res.status(404).send(new CustomResponse(404, "Invalid user id"));
     }
   } catch (error) {
-    console.error(error);
     res.status(500).send(new CustomResponse(500, "Internal Server Error"));
   }
 };
