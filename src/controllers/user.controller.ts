@@ -2,6 +2,7 @@ import express from "express";
 import UserModel from "../models/user.model";
 import CustomResponse from "../dtos/custom.response";
 import * as SchemaTypes from "../types/SchemaTypes";
+import * as RegexValidator from "../util/RegexValidator";
 import jwt, { Secret } from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { ObjectId } from "mongoose";
@@ -121,9 +122,8 @@ export const updateUser = async (
   try {
     const req_body: any = req.body;
     const userId = req.params.id;
-    const validationRegex = new RegExp("^[0-9a-fA-F]{24}$");
 
-    if (validationRegex.test(userId)) {
+    if (RegexValidator.ValidateObjectId(userId)) {
       const exUser: SchemaTypes.IUser | null = await UserModel.findById(userId);
 
       if (!exUser)
