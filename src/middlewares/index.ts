@@ -1,8 +1,12 @@
+import CustomResponse from "../dtos/custom.response";
 import express from "express";
 import jwt, { Secret } from "jsonwebtoken";
 import process from "process";
+import * as UserController from "./../controllers/user.controller";
+import UserModel from "../models/user.model";
+import * as SchemaTypes from "../types/SchemaTypes";
 
-export const verifyToken = (
+export const verifyToken = async (
   req: express.Request,
   res: any,
   next: express.NextFunction
@@ -10,14 +14,66 @@ export const verifyToken = (
   const secret = req.headers.authorization;
 
   if (!secret) {
-    return res.status(401).json("Token empty");
+    return res.status(401).send(new CustomResponse(401, "Token not provided"));
   }
   const token = secret.substring(7);
   try {
-    const data = jwt.verify(token, process.env.SECRET as Secret);
-    res.tokenData = data;
+    const data = jwt.verify(token, process.env.SECRET as Secret) as {
+      user: { email: string };
+    };
+    const email = data.user.email;
+
+    const user: SchemaTypes.IUser | null = await UserModel.findOne({
+      email,
+    });
+
+    if (!user) {
+      throw new Error("user email not exists");
+    }
+    res.tokenData = user;
     next();
   } catch (error) {
-    return res.status(401).json("Invalid token");
+    return res.status(403).send(new CustomResponse(403, "Invalid token"));
+  }
+};
+
+export const verifyIsAdmin = (
+  req: express.Request,
+  res: any,
+  next: express.NextFunction
+) => {
+  try {
+    const role = res.tokenData.role;
+    if (!role || role !== "ADMIN") {
+      return res
+        .status(403)
+        .send(
+          new CustomResponse(403, "Permission denied. User is not an admin")
+        );
+    }
+    next();
+  } catch (err) {
+    return res.status(403).send(new CustomResponse(403, "Invalid token"));
+  }
+};
+
+export const verifyIsTheaterEmployee = (
+  req: express.Request,
+  res: any,
+  next: express.NextFunction
+) => {
+  try {
+    const role = res.tokenData.role;
+    console.log(role === "THEATER_EMPLOYEE" || role === "ADMIN");
+    if (role !== "THEATER_EMPLOYEE" && role !== "ADMIN") {
+      return res
+        .status(403)
+        .send(
+          new CustomResponse(403, "Permission denied. User is not an admin")
+        );
+    }
+    next();
+  } catch (err) {
+    return res.status(403).send(new CustomResponse(403, "Invalid token"));
   }
 };

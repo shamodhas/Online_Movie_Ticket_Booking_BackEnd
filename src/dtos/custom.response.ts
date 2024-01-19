@@ -48,6 +48,7 @@ export default class CustomResponse {
       status: this._status,
       message: this._message,
       data: this._data,
+      pageCount: this._pageCount,
     };
   }
 }

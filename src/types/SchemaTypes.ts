@@ -16,5 +16,6 @@ export interface IMovie extends Document {
   startDate: Date;
   endDate: Date;
   trailerLink: string;
+  status: string;
   user: ObjectId;
 }

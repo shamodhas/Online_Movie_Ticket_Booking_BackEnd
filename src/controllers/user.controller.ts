@@ -11,10 +11,26 @@ export const getAllUser = async (
   res: express.Response
 ) => {
   try {
-    let users = await UserModel.find();
+    let req_query: any = req.query;
+    let size: number = req_query.size;
+    let page: number = req_query.page;
+
+    let users = await UserModel.find()
+      .limit(size)
+      .skip(size * (page - 1));
+    let documentCount = await UserModel.countDocuments();
+
+    let pageCount = Math.ceil(documentCount / size);
     res
       .status(200)
-      .send(new CustomResponse(200, "Users are found successfully", users));
+      .send(
+        new CustomResponse(
+          200,
+          "Users are found successfully",
+          users,
+          pageCount
+        )
+      );
   } catch (error) {
     res.status(500).send("Internal Server Error");
   }
