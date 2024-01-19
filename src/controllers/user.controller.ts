@@ -4,6 +4,8 @@ import CustomResponse from "../dtos/custom.response";
 import * as SchemaTypes from "../types/SchemaTypes";
 import jwt, { Secret } from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { ObjectId } from "mongoose";
+import { error } from "console";
 
 export const getAllUser = async (
   req: express.Request,
@@ -14,6 +16,64 @@ export const getAllUser = async (
     res
       .status(200)
       .send(new CustomResponse(200, "Users are found successfully", users));
+  } catch (error) {
+    res.status(100).send("Error");
+  }
+};
+
+export const getUserByEmail = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  let user: SchemaTypes.IUser | null = await UserModel.findOne({
+    email: req.params.email,
+  });
+  if (user) {
+    user.password = "";
+    res.status(200).send(new CustomResponse(200, "User Found", user));
+  } else {
+    res.status(404).send(new CustomResponse(404, "User not found"));
+  }
+};
+
+export const authUser = async (req: express.Request, res: express.Response) => {
+  try {
+    let request_body = req.body;
+
+    let user: SchemaTypes.IUser | null = await UserModel.findOne({
+      email: request_body.email,
+    });
+    if (user) {
+      let isMatch = await bcrypt.compare(request_body.password, user.password);
+      if (isMatch) {
+        user.password = "";
+        const expiresIn = "1w";
+
+        jwt.sign(
+          { user },
+          process.env.SECRET as Secret,
+          { expiresIn },
+          (err: any, token: any) => {
+            if (err) {
+              res
+                .status(100)
+                .send(new CustomResponse(100, "Something went wrong"));
+            } else {
+              let res_body = {
+                user: user,
+                accessToken: token,
+              };
+
+              res.status(200).send(new CustomResponse(200, "Access", res_body));
+            }
+          }
+        );
+      } else {
+        res.status(401).send(new CustomResponse(401, "Invalid credentials"));
+      }
+    } else {
+      res.status(404).send(new CustomResponse(404, "User not found"));
+    }
   } catch (error) {
     res.status(100).send("Error");
   }
@@ -33,7 +93,7 @@ export const registeredUser = async (
       const userModel = new UserModel({
         name: req_body.name,
         email: req_body.email,
-        password: req_body.password,
+        password: hash,
         mobileNumber: req_body.mobileNumber,
         role: req_body.role,
       });
@@ -55,6 +115,52 @@ export const registeredUser = async (
 };
 
 export const updateUser = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const req_body: any = req.body;
+    const userId = req.params.id;
+    try {
+      const exUser: SchemaTypes.IUser | null = await UserModel.findById(userId);
+      console.log(exUser)
+      if (!exUser) {
+        throw new Error("User not found");
+      }
+
+      exUser.name = req_body.name || exUser.name;
+      exUser.email = req_body.email || exUser.email;
+      exUser.password =
+        (req_body.password && (await bcrypt.hash(req_body.password, 8))) ||
+        exUser.password;
+      exUser.mobileNumber = req_body.mobileNumber || exUser.mobileNumber;
+      exUser.role = req_body.role || exUser.role;
+
+      const updateResult: any = await UserModel.updateOne(
+        { _id: userId },
+        exUser
+      );
+
+      if (updateResult.modifiedCount > 0) {
+        exUser.password = "";
+        console.log(exUser);
+        res
+          .status(200)
+          .send(new CustomResponse(200, "User updated successfully", exUser));
+      } else {
+        res.status(400).send(new CustomResponse(400, "Fail to update user"));
+      }
+    } catch (err) {
+      console.log(err)
+      res.status(404).send(new CustomResponse(404, "User not found"));
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(new CustomResponse(500, "Internal Server Error"));
+  }
+};
+
+export const deleteUser = async (
   req: express.Request,
   res: express.Response
 ) => {
@@ -95,50 +201,5 @@ export const updateUser = async (
   } catch (error) {
     console.error(error);
     res.status(500).json(new CustomResponse(500, "Internal Server Error"));
-  }
-};
-
-export const authUser = async (req: express.Request, res: express.Response) => {
-  try {
-    let request_body = req.body;
-
-    let user: SchemaTypes.IUser | null = await UserModel.findOne({
-      email: request_body.email,
-    });
-    if (user) {
-      let isMatch = await bcrypt.compare(request_body.password, user.password);
-
-      if (isMatch) {
-        user.password = "";
-
-        const expiresIn = "1w";
-
-        jwt.sign(
-          { user },
-          process.env.SECRET as Secret,
-          { expiresIn },
-          (err: any, token: any) => {
-            if (err) {
-              res
-                .status(100)
-                .send(new CustomResponse(100, "Something went wrong"));
-            } else {
-              let res_body = {
-                user: user,
-                accessToken: token,
-              };
-
-              res.status(200).send(new CustomResponse(200, "Access", res_body));
-            }
-          }
-        );
-      } else {
-        res.status(401).send(new CustomResponse(401, "Invalid credentials"));
-      }
-    } else {
-      res.status(404).send(new CustomResponse(404, "User not found"));
-    }
-  } catch (error) {
-    res.status(100).send("Error");
   }
 };

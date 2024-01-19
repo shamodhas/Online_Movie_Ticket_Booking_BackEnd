@@ -7,13 +7,12 @@ export const verifyToken = (
   res: any,
   next: express.NextFunction
 ) => {
-  const token = req.headers.authorization;
-  // verify the token
+  const secret = req.headers.authorization;
 
-  if (!token) {
+  if (!secret) {
     return res.status(401).json("Token empty");
   }
-
+  const token = secret.substring(7);
   try {
     const data = jwt.verify(token, process.env.SECRET as Secret);
     res.tokenData = data;

@@ -10,12 +10,9 @@ dotenv.config();
 const port = 8080;
 const app = express();
 
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
+
 app.use("/user", UserRoutes);
 
 mongoose.connect(process.env.MONGO_URL as string);

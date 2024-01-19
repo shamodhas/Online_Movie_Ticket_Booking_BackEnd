@@ -2,7 +2,6 @@ import { Schema, model, ObjectId } from "mongoose";
 import * as SchemaTypes from "../types/SchemaTypes";
 
 const movieSchema = new Schema<SchemaTypes.IMovie>({
-  id: { type: String, required: true },
   name: { type: String, required: true },
   director: { type: String, required: true },
   language: { type: String, required: true },
