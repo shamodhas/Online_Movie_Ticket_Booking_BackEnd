@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import * as process from "process";
 import UserRoutes from "./routes/user.routes";
 import MovieRoutes from "./routes/movie.routes";
+import TheaterRoutes from "./routes/theater.routes";
 import cors from "cors";
 
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(bodyParser.json());
 
 app.use("/user", UserRoutes);
 app.use("/movie", MovieRoutes);
+app.use("/theater", TheaterRoutes);
 
 mongoose.connect(process.env.MONGO_URL as string);
 const db = mongoose.connection;

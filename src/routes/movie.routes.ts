@@ -7,28 +7,35 @@ const router = express.Router();
 router.get("/all", MovieController.getAllMovies);
 
 router.get("/:name", MovieController.getMovieByName);
-// /user/{userId}
-router.get("/user/:userId", MovieController.getMovieByUser);
-// /
+
+router.get("/user/:userId", MovieController.getMoviesByUser);
+
 router.post(
   "/",
   Middleware.verifyToken,
   Middleware.verifyIsTheaterEmployee,
   MovieController.createMovie
 );
-// /{id}
+
 router.put(
   "/:id",
   Middleware.verifyToken,
   Middleware.verifyIsTheaterEmployee,
-  MovieController.createMovie
-); 
-// /{id}
+  MovieController.updateMovie
+);
+
+router.put(
+  "/status/:id",
+  Middleware.verifyToken,
+  Middleware.verifyIsAdmin,
+  MovieController.updateMovieStatus
+);
+
 router.delete(
   "/:id",
   Middleware.verifyToken,
   Middleware.verifyIsTheaterEmployee,
-  MovieController.createMovie
+  MovieController.deleteMovie
 );
 
 export default router;

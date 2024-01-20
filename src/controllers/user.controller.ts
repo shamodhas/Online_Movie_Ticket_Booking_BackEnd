@@ -207,9 +207,9 @@ export const deleteUser = async (
 
         const deleteResult = await UserModel.deleteOne({ _id: userId });
         if (deleteResult.deletedCount && deleteResult.deletedCount > 0) {
-          res.status(200).json(new CustomResponse(200, "User deleted"));
+          res.status(200).send(new CustomResponse(200, "User deleted"));
         } else {
-          res.status(500).json(new CustomResponse(500, "Fail to delete user"));
+          res.status(400).send(new CustomResponse(400, "Fail to delete user"));
         }
       } else {
         res.status(404).send(new CustomResponse(404, "User not found"));
