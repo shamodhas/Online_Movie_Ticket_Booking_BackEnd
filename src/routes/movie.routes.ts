@@ -3,12 +3,12 @@ import * as Middleware from "../middlewares";
 import * as MovieController from "./../controllers/movie.controller";
 
 const router = express.Router();
-// /all?size=?page=?
+
 router.get("/all", MovieController.getAllMovies);
-// /{name}
-router.put("/:name", MovieController.getMovieByName);
+
+router.get("/:name", MovieController.getMovieByName);
 // /user/{userId}
-router.put("/user/:userId", MovieController.getMovieByUser);
+router.get("/user/:userId", MovieController.getMovieByUser);
 // /
 router.post(
   "/",

@@ -26,11 +26,12 @@ export const verifyToken = async (
     const user: SchemaTypes.IUser | null = await UserModel.findOne({
       email,
     });
-
+    // validate tokens data
     if (!user) {
       throw new Error("user email not exists");
     }
-    res.tokenData = user;
+
+    res.tokenData = data;
     next();
   } catch (error) {
     return res.status(403).send(new CustomResponse(403, "Invalid token"));
@@ -43,7 +44,7 @@ export const verifyIsAdmin = (
   next: express.NextFunction
 ) => {
   try {
-    const role = res.tokenData.role;
+    const role = res.tokenData.user.role;
     if (!role || role !== "ADMIN") {
       return res
         .status(403)
@@ -63,8 +64,7 @@ export const verifyIsTheaterEmployee = (
   next: express.NextFunction
 ) => {
   try {
-    const role = res.tokenData.role;
-    console.log(role === "THEATER_EMPLOYEE" || role === "ADMIN");
+    const role = res.tokenData.user.role;
     if (role !== "THEATER_EMPLOYEE" && role !== "ADMIN") {
       return res
         .status(403)
