@@ -4,31 +4,33 @@ import * as HallController from "./../controllers/hall.controller";
 
 const router = express.Router();
 
-router.get("/all", HallController.getAllTheaters);
+router.get("/all", HallController.getAllHalls);
 
-router.get("/:hallNumber", HallController.getTheaterByName);
+router.get("/:hallNumber", HallController.getHallByHallNumber);
 
-router.get("/user/:userId", HallController.getTheatersByUser);
+router.get("/user/:userId", HallController.getHallsByUser);
+
+router.get("/theater/:theaterId", HallController.getHallsByUser);
 
 router.post(
   "/",
   Middleware.verifyToken,
   Middleware.verifyIsTheaterEmployee,
-  HallController.saveTheater
+  HallController.saveHall
 );
 
 router.put(
   "/:id",
   Middleware.verifyToken,
   Middleware.verifyIsTheaterEmployee,
-  HallController.updateTheater
+  HallController.updateHall
 );
 
 router.delete(
   "/:id",
   Middleware.verifyToken,
   Middleware.verifyIsTheaterEmployee,
-  HallController.deleteTheater
+  HallController.deleteHall
 );
 
 export default router;
