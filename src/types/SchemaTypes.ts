@@ -5,6 +5,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   mobileNumber: string;
+  status: string;
   role: string;
 }
 
@@ -17,5 +18,26 @@ export interface IMovie extends Document {
   endDate: Date;
   trailerLink: string;
   status: string;
+  user: ObjectId;
+}
+
+export interface ITheater extends Document {
+  name: string;
+  location: string;
+  mobileNumber: string;
+  user: ObjectId;
+}
+
+export interface IHall extends Document {
+  hallNumber: string;
+  theater: ObjectId;
+  user: ObjectId;
+}
+
+export interface ISeatType extends Document {
+  seatType: string;
+  seatCount: number;
+  price: number;
+  hall: ObjectId;
   user: ObjectId;
 }

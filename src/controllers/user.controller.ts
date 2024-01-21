@@ -68,6 +68,12 @@ export const authUser = async (req: express.Request, res: express.Response) => {
       email: request_body.email,
     });
     if (user) {
+      if (user.status !== "Active") {
+        res
+          .status(401)
+          .send(new CustomResponse(401, "Your Account is not activate"));
+      }
+
       let isMatch = await bcrypt.compare(request_body.password, user.password);
       if (isMatch) {
         user.password = "";
@@ -133,6 +139,7 @@ export const registeredUser = async (
             email: req_body.email,
             password: hash,
             mobileNumber: req_body.mobileNumber,
+            status: req_body.role === "CUSTOMER" ? "Active" : "Not Active",
             role: req_body.role,
           });
           let user: SchemaTypes.IUser | null = await userModel.save();
@@ -185,6 +192,41 @@ export const updateUser = async (
         res.status(200).send(new CustomResponse(200, "User updated", exUser));
       } else {
         res.status(400).send(new CustomResponse(400, "Fail to update user"));
+      }
+    } else {
+      res.status(400).send(new CustomResponse(400, "Invalid user id"));
+    }
+  } catch (error) {
+    res.status(500).send(new CustomResponse(500, "Internal Server Error"));
+  }
+};
+
+export const updateUserStatus = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const req_body: any = req.body;
+    const userId = req.params.id;
+
+    if (RegexValidator.ValidateObjectId(userId)) {
+      const exUser: SchemaTypes.IUser | null = await UserModel.findById(userId);
+
+      if (!exUser)
+        return res.status(404).send(new CustomResponse(404, "User not found"));
+
+      exUser.status = req_body.status || exUser.status;
+
+      const updateResult: any = await UserModel.updateOne(
+        { _id: userId },
+        exUser
+      );
+
+      if (updateResult.modifiedCount > 0) {
+        exUser.password = "";
+        res.status(200).send(new CustomResponse(200, "User status updated", exUser));
+      } else {
+        res.status(400).send(new CustomResponse(400, "Fail to update user status"));
       }
     } else {
       res.status(400).send(new CustomResponse(400, "Invalid user id"));

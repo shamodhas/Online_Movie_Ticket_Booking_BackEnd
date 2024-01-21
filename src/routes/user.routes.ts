@@ -14,6 +14,13 @@ router.post("/", UserController.registeredUser);
 
 router.put("/:id", Middleware.verifyToken, UserController.updateUser);
 
+router.put(
+  "/status/:id",
+  Middleware.verifyToken,
+  Middleware.verifyIsAdmin,
+  UserController.updateUserStatus
+);
+
 router.delete("/:id", Middleware.verifyToken, UserController.deleteUser);
 
 export default router;

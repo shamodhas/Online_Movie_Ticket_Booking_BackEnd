@@ -157,8 +157,8 @@ export const updateMovie = async (req: express.Request, res: any) => {
 
       if (!movie)
         return res.status(404).send(new CustomResponse(404, "Movie not found"));
-      console.log(movie.user !== userId);
-      if (movie.user !== userId && userRole !== "ADMIN")
+
+      if (movie.user.toString() !== userId || userRole !== "ADMIN")
         return res
           .status(400)
           .send(new CustomResponse(400, "Movie owner not you"));
@@ -238,7 +238,7 @@ export const deleteMovie = async (req: express.Request, res: any) => {
       const movie = await MovieModel.findById(movieId);
       if (movie) {
         // user usage check
-        if (movie.user !== userId && userRole !== "ADMIN")
+        if (movie.user.toString() !== userId || userRole !== "ADMIN")
           return res
             .status(400)
             .send(new CustomResponse(400, "Movie owner not you"));
