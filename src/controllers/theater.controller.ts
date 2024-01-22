@@ -70,32 +70,28 @@ export const getTheatersByUser = async (
     let size: number = req_query.size;
     let page: number = req_query.page;
     const userId = req.params.userId;
-    if (!userId) {
+    if (!userId || !RegexValidator.ValidateObjectId(userId)) {
       res.status(400).send(new CustomResponse(400, "Invalid user id"));
     } else {
-      try {
-        let user: any = await UserModel.findById(userId);
+      let user: any = await UserModel.findById(userId);
 
-        if (!user) {
-          throw new Error("User not found");
-        } else {
-          let theaters: any = await TheaterModel.find({
-            user: userId,
-          })
-            .limit(size)
-            .skip(size * (page - 1));
-          let documentCount = await TheaterModel.countDocuments({
-            user: user._id,
-          });
-          let pageCount = Math.ceil(documentCount / size);
-          res
-            .status(200)
-            .send(
-              new CustomResponse(200, "Theaters Founded", theaters, pageCount)
-            );
-        }
-      } catch (err) {
+      if (!user) {
         res.status(404).send(new CustomResponse(404, "User not found"));
+      } else {
+        let theaters: any = await TheaterModel.find({
+          user: userId,
+        })
+          .limit(size)
+          .skip(size * (page - 1));
+        let documentCount = await TheaterModel.countDocuments({
+          user: user._id,
+        });
+        let pageCount = Math.ceil(documentCount / size);
+        res
+          .status(200)
+          .send(
+            new CustomResponse(200, "Theaters Founded", theaters, pageCount)
+          );
       }
     }
   } catch (err) {

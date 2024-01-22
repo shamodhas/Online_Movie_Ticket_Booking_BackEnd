@@ -1,5 +1,6 @@
 import express from "express";
 import HallModel from "../models/hall.model";
+import TheaterModel from "../models/theater.model";
 import CustomResponse from "../dtos/custom.response";
 import * as SchemaTypes from "../types/SchemaTypes";
 import { ObjectId } from "mongodb";
@@ -13,48 +14,59 @@ export const getHallByHallNumber = (
   res: express.Response
 ) => {};
 
-export const getHallsByUser = (req: express.Request, res: express.Response) => {};
+export const getHallsByUser = (
+  req: express.Request,
+  res: express.Response
+) => {};
 
-export const saveHall = (req: express.Request, res: any) => {
+export const saveHall = async (req: express.Request, res: any) => {
   try {
     const req_body: any = req.body;
     const userId = res.tokenData.user._id;
+    const theaterId = req_body.theater;
 
     if (!req_body.hallNumber) {
       res.status(400).send(new CustomResponse(400, "Invalid hall number"));
     }
+    if (!RegexValidator.ValidateObjectId(theaterId)) {
+      res.status(400).send(new CustomResponse(400, "Invalid theater Id"));
+    }
     // validate data
     else {
-      let movie: SchemaTypes.IMovie | null = await MovieModel.findOne({
-        name: req_body.name,
+      let hall: SchemaTypes.IHall | null = await HallModel.findOne({
+        hallNumber: req_body.hallNumber,
       });
-      if (movie) {
-        res.status(400).send(new CustomResponse(400, "Duplicate movie name"));
+      if (hall) {
+        res.status(400).send(new CustomResponse(400, "Duplicate hall number"));
       } else {
-        const movieModel = new MovieModel({
-          name: req_body.name,
-          director: req_body.director,
-          language: req_body.language,
-          description: req_body.description,
-          startDate: req_body.startDate,
-          endDate: req_body.endDate,
-          trailerLink: req_body.trailerLink,
-          status: "DEACTIVATE",
-          user: new ObjectId(userId),
-        });
-        await movieModel
-          .save()
-          .then((modelRes) => {
-            res
-              .status(200)
-              .send(new CustomResponse(200, "Movie saved", modelRes));
-          })
-          .catch((err) => {
-            res.status(500).send(new CustomResponse(500, "Fail to save movie"));
+        let theater: any = await TheaterModel.findById(theaterId);
+        console.log(theater);
+
+        if (theater) {
+          const hallModel = new HallModel({
+            hallNumber: req_body.hallNumber,
+            theater: new ObjectId(theaterId),
+            user: new ObjectId(userId),
           });
+          await hallModel
+            .save()
+            .then((modelRes) => {
+              res
+                .status(200)
+                .send(new CustomResponse(200, "Hall saved", modelRes));
+            })
+            .catch((err) => {
+              res
+                .status(500)
+                .send(new CustomResponse(500, "Fail to save hall"));
+            });
+        } else {
+          res.status(404).send(new CustomResponse(404, "Theater not found"));
+        }
       }
     }
   } catch (err) {
+    console.log(err);
     res.status(500).send(new CustomResponse(500, "Internal Server Error"));
   }
 };
