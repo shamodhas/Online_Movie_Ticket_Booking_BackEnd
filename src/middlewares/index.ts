@@ -31,6 +31,7 @@ export const verifyToken = async (
       throw new Error("user email not exists");
     }
 
+    // need change data to user, becorse token data not suver
     res.tokenData = data;
     next();
   } catch (error) {

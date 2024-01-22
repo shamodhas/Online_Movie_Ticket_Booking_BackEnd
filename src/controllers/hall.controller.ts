@@ -105,21 +105,21 @@ export const getHallsByTheater = async (
     let size: number = req_query.size;
     let page: number = req_query.page;
     const theaterId = req.params.theaterId;
-    if (!userId || !RegexValidator.ValidateObjectId(userId)) {
-      res.status(400).send(new CustomResponse(400, "Invalid user id"));
+    if (!theaterId || !RegexValidator.ValidateObjectId(theaterId)) {
+      res.status(400).send(new CustomResponse(400, "Invalid theater id"));
     } else {
-      let user: any = await UserModel.findById(userId);
+      let theater: any = await TheaterModel.findById(theaterId);
 
-      if (!user) {
-        res.status(404).send(new CustomResponse(404, "User not found"));
+      if (!theater) {
+        res.status(404).send(new CustomResponse(404, "Theater not found"));
       } else {
         let halls: any = await HallModel.find({
-          user: userId,
+          theater: theaterId,
         })
           .limit(size)
           .skip(size * (page - 1));
         let documentCount = await HallModel.countDocuments({
-          user: user._id,
+          theater: theaterId,
         });
         let pageCount = Math.ceil(documentCount / size);
         res
@@ -183,6 +183,43 @@ export const saveHall = async (req: express.Request, res: any) => {
   }
 };
 
-export const updateHall = (req: express.Request, res: express.Response) => {};
+export const updateHall = async (req: express.Request, res: any) => {
+  try {
+    const req_body: any = req.body;
+    const hallId = req.params.id;
+    const userId = res.tokenData.user._id;
+    const userRole = res.tokenData.user.role;
+
+    if (RegexValidator.ValidateObjectId(hallId)) {
+      const hall: SchemaTypes.IHall | null = await HallModel.findById(hallId);
+
+      if (!hall)
+        return res.status(404).send(new CustomResponse(404, "Hall not found"));
+
+      if (hall.user.toString() !== userId && userRole !== "ADMIN")
+        return res
+          .status(400)
+          .send(new CustomResponse(400, "Hall owner not you"));
+
+      hall.hallNumber = req_body.hallNumber || hall.hallNumber;
+      hall.theater = req_body.theater || hall.theater;
+
+      const updateResult: any = await HallModel.updateOne(
+        { _id: hallId },
+        hall
+      );
+
+      if (updateResult.modifiedCount > 0) {
+        res.status(200).send(new CustomResponse(200, "Hall updated", hall));
+      } else {
+        res.status(400).send(new CustomResponse(400, "Fail to update hall"));
+      }
+    } else {
+      res.status(400).send(new CustomResponse(400, "Invalid hall id"));
+    }
+  } catch (error) {
+    res.status(500).send(new CustomResponse(500, "Internal Server Error"));
+  }
+};
 
 export const deleteHall = (req: express.Request, res: express.Response) => {};
