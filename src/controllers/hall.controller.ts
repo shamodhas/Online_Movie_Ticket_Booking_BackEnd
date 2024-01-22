@@ -105,7 +105,7 @@ export const getHallsByTheater = async (
     let size: number = req_query.size;
     let page: number = req_query.page;
     const theaterId = req.params.theaterId;
-    
+
     if (!RegexValidator.ValidateObjectId(theaterId)) {
       res.status(400).send(new CustomResponse(400, "Invalid theater id"));
     } else {
@@ -223,4 +223,36 @@ export const updateHall = async (req: express.Request, res: any) => {
   }
 };
 
-export const deleteHall = (req: express.Request, res: express.Response) => {};
+export const deleteHall = async (req: express.Request, res: any) => {
+  try {
+    const hallId = req.params.id;
+    const userId = res.tokenData.user._id;
+    const userRole = res.tokenData.user.role;
+
+    if (RegexValidator.ValidateObjectId(hallId)) {
+      const hall = await HallModel.findById(hallId);
+      if (hall) {
+        // user usage check
+        if (!(hall.user.toString() === userId || userRole === "ADMIN"))
+          return res
+            .status(400)
+            .send(new CustomResponse(400, "Hall owner not you"));
+
+        const deleteResult = await HallModel.deleteOne({ _id: hallId });
+
+        if (deleteResult.deletedCount && deleteResult.deletedCount > 0) {
+          res.status(200).send(new CustomResponse(200, "Hall deleted"));
+        } else {
+          res.status(400).send(new CustomResponse(400, "Fail to delete hall"));
+        }
+      } else {
+        res.status(404).send(new CustomResponse(404, "movie not found"));
+      }
+    } else {
+      res.status(400).send(new CustomResponse(400, "Invalid movie id"));
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(new CustomResponse(500, "Internal Server Error"));
+  }
+};
