@@ -70,7 +70,8 @@ export const getTheatersByUser = async (
     let size: number = req_query.size;
     let page: number = req_query.page;
     const userId = req.params.userId;
-    if (!userId || !RegexValidator.ValidateObjectId(userId)) {
+
+    if (!RegexValidator.ValidateObjectId(userId)) {
       res.status(400).send(new CustomResponse(400, "Invalid user id"));
     } else {
       let user: any = await UserModel.findById(userId);
