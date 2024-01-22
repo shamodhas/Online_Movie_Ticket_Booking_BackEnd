@@ -4,29 +4,26 @@ import * as HallController from "./../controllers/hall.controller";
 
 const router = express.Router();
 
-router.get(
-  "/all",
-  Middleware.verifyToken,
-  HallController.getAllHalls
-);
+router.get("/all", Middleware.verifyToken, HallController.getAllHalls);
 
 router.get(
   "/:hallNumber",
   Middleware.verifyToken,
   HallController.getHallByHallNumber
-); 
+);
 
 router.get(
   "/user/:userId",
   Middleware.verifyToken,
+  Middleware.verifyIsAdmin,
   HallController.getHallsByUser
-); //
+);
 
 router.get(
   "/theater/:theaterId",
   Middleware.verifyToken,
-  HallController.getHallsByUser
-); //
+  HallController.getHallsByTheater
+);
 
 router.post(
   "/",

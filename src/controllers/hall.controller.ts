@@ -47,12 +47,10 @@ export const getHallByHallNumber = async (
       res.status(400).send(new CustomResponse(400, "Invalid hall Number"));
     } else {
       let hall: SchemaTypes.IHall | null = await HallModel.findOne({
-        hallNumber
+        hallNumber,
       });
       if (hall) {
-        res
-          .status(200)
-          .send(new CustomResponse(200, "Hall Founded", hall));
+        res.status(200).send(new CustomResponse(200, "Hall Founded", hall));
       } else {
         res.status(404).send(new CustomResponse(404, "Hall not found"));
       }
@@ -62,11 +60,76 @@ export const getHallByHallNumber = async (
   }
 };
 
-export const getHallsByUser = (
+export const getHallsByUser = async (
   req: express.Request,
   res: express.Response
 ) => {
-  
+  try {
+    let req_query: any = req.query;
+    let size: number = req_query.size;
+    let page: number = req_query.page;
+    const userId = req.params.userId;
+    if (!userId || !RegexValidator.ValidateObjectId(userId)) {
+      res.status(400).send(new CustomResponse(400, "Invalid user id"));
+    } else {
+      let user: any = await UserModel.findById(userId);
+
+      if (!user) {
+        res.status(404).send(new CustomResponse(404, "User not found"));
+      } else {
+        let halls: any = await HallModel.find({
+          user: userId,
+        })
+          .limit(size)
+          .skip(size * (page - 1));
+        let documentCount = await HallModel.countDocuments({
+          user: user._id,
+        });
+        let pageCount = Math.ceil(documentCount / size);
+        res
+          .status(200)
+          .send(new CustomResponse(200, "Halls Founded", halls, pageCount));
+      }
+    }
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+export const getHallsByTheater = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    let req_query: any = req.query;
+    let size: number = req_query.size;
+    let page: number = req_query.page;
+    const theaterId = req.params.theaterId;
+    if (!userId || !RegexValidator.ValidateObjectId(userId)) {
+      res.status(400).send(new CustomResponse(400, "Invalid user id"));
+    } else {
+      let user: any = await UserModel.findById(userId);
+
+      if (!user) {
+        res.status(404).send(new CustomResponse(404, "User not found"));
+      } else {
+        let halls: any = await HallModel.find({
+          user: userId,
+        })
+          .limit(size)
+          .skip(size * (page - 1));
+        let documentCount = await HallModel.countDocuments({
+          user: user._id,
+        });
+        let pageCount = Math.ceil(documentCount / size);
+        res
+          .status(200)
+          .send(new CustomResponse(200, "Halls Founded", halls, pageCount));
+      }
+    }
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
+  }
 };
 
 export const saveHall = async (req: express.Request, res: any) => {
