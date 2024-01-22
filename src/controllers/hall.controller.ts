@@ -7,17 +7,67 @@ import { ObjectId } from "mongodb";
 import UserModel from "../models/user.model";
 import * as RegexValidator from "../util/RegexValidator";
 
-export const getAllHalls = (req: express.Request, res: express.Response) => {};
-
-export const getHallByHallNumber = (
+export const getAllHalls = async (
   req: express.Request,
   res: express.Response
-) => {};
+) => {
+  try {
+    let req_query: any = req.query;
+    let size: number = req_query.size;
+    let page: number = req_query.page;
+
+    let halls = await HallModel.find()
+      .limit(size)
+      .skip(size * (page - 1));
+    let documentCount = await HallModel.countDocuments();
+
+    let pageCount = Math.ceil(documentCount / size);
+    res
+      .status(200)
+      .send(
+        new CustomResponse(
+          200,
+          "Halls are found successfully",
+          halls,
+          pageCount
+        )
+      );
+  } catch (error) {
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+export const getHallByHallNumber = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const hallNumber = req.params.hallNumber;
+    if (!hallNumber) {
+      res.status(400).send(new CustomResponse(400, "Invalid hall Number"));
+    } else {
+      let hall: SchemaTypes.IHall | null = await HallModel.findOne({
+        hallNumber
+      });
+      if (hall) {
+        res
+          .status(200)
+          .send(new CustomResponse(200, "Hall Founded", hall));
+      } else {
+        res.status(404).send(new CustomResponse(404, "Hall not found"));
+      }
+    }
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
+  }
+};
 
 export const getHallsByUser = (
   req: express.Request,
   res: express.Response
-) => {};
+) => {
+  
+};
 
 export const saveHall = async (req: express.Request, res: any) => {
   try {
@@ -66,7 +116,6 @@ export const saveHall = async (req: express.Request, res: any) => {
       }
     }
   } catch (err) {
-    console.log(err);
     res.status(500).send(new CustomResponse(500, "Internal Server Error"));
   }
 };
