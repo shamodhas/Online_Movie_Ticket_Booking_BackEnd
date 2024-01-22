@@ -69,7 +69,7 @@ export const getHallsByUser = async (
     let size: number = req_query.size;
     let page: number = req_query.page;
     const userId = req.params.userId;
-    if (!userId || !RegexValidator.ValidateObjectId(userId)) {
+    if (!RegexValidator.ValidateObjectId(userId)) {
       res.status(400).send(new CustomResponse(400, "Invalid user id"));
     } else {
       let user: any = await UserModel.findById(userId);
@@ -105,7 +105,8 @@ export const getHallsByTheater = async (
     let size: number = req_query.size;
     let page: number = req_query.page;
     const theaterId = req.params.theaterId;
-    if (!theaterId || !RegexValidator.ValidateObjectId(theaterId)) {
+    
+    if (!RegexValidator.ValidateObjectId(theaterId)) {
       res.status(400).send(new CustomResponse(400, "Invalid theater id"));
     } else {
       let theater: any = await TheaterModel.findById(theaterId);
@@ -196,7 +197,7 @@ export const updateHall = async (req: express.Request, res: any) => {
       if (!hall)
         return res.status(404).send(new CustomResponse(404, "Hall not found"));
 
-      if (hall.user.toString() !== userId && userRole !== "ADMIN")
+      if (!(hall.user.toString() === userId || userRole === "ADMIN"))
         return res
           .status(400)
           .send(new CustomResponse(400, "Hall owner not you"));
