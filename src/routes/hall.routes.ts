@@ -37,7 +37,7 @@ router.put(
   Middleware.verifyToken,
   Middleware.verifyIsTheaterEmployee,
   HallController.updateHall
-); //
+); 
 
 router.delete(
   "/:id",

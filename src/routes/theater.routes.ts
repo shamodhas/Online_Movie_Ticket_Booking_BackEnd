@@ -8,7 +8,12 @@ router.get("/all", TheaterController.getAllTheaters);
 
 router.get("/:name", TheaterController.getTheaterByName);
 
-router.get("/user/:userId", TheaterController.getTheatersByUser);
+router.get(
+  "/user/:userId",
+  Middleware.verifyToken,
+  Middleware.verifyIsAdmin,
+  TheaterController.getTheatersByUser
+);
 
 router.post(
   "/",

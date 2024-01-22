@@ -8,7 +8,12 @@ router.get("/all", MovieController.getAllMovies);
 
 router.get("/:name", MovieController.getMovieByName);
 
-router.get("/user/:userId", MovieController.getMoviesByUser);
+router.get(
+  "/user/:userId",
+  Middleware.verifyToken,
+  Middleware.verifyIsAdmin,
+  MovieController.getMoviesByUser
+);
 
 router.post(
   "/",
