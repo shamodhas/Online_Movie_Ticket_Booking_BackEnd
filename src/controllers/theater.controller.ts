@@ -158,7 +158,7 @@ export const updateTheater = async (req: express.Request, res: any) => {
         return res
           .status(404)
           .send(new CustomResponse(404, "Theater not found"));
-        
+          
       if (!(theater.user.toString() === userId || userRole === "ADMIN"))
         return res
           .status(400)
@@ -198,7 +198,7 @@ export const deleteTheater = async (req: express.Request, res: any) => {
       const theater = await TheaterModel.findById(theaterId);
       if (theater) {
         // user usage check
-        if (theater.user.toString() !== userId || userRole !== "ADMIN")
+        if (!(theater.user.toString() === userId || userRole === "ADMIN"))
           return res
             .status(400)
             .send(new CustomResponse(400, "Theater owner not you"));
