@@ -34,7 +34,7 @@ export interface IHall extends Document {
   user: ObjectId;
 }
 
-export interface ISeatType extends Document {
+export interface ISeat extends Document {
   seatType: string;
   seatCount: number;
   price: number;

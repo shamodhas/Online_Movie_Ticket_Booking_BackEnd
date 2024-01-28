@@ -44,6 +44,6 @@ router.delete(
   Middleware.verifyToken,
   Middleware.verifyIsTheaterEmployee,
   HallController.deleteHall
-); //
+);
 
 export default router;
