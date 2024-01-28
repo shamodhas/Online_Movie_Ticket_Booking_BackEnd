@@ -7,6 +7,7 @@ import UserRoutes from "./routes/user.routes";
 import MovieRoutes from "./routes/movie.routes";
 import TheaterRoutes from "./routes/theater.routes";
 import HallRoutes from "./routes/hall.routes";
+import SeatRoutes from "./routes/seat.routes";
 import cors from "cors";
 
 dotenv.config();
@@ -20,6 +21,7 @@ app.use("/user", UserRoutes);
 app.use("/movie", MovieRoutes);
 app.use("/theater", TheaterRoutes);
 app.use("/hall", HallRoutes);
+app.use("/seat", SeatRoutes);
 
 mongoose.connect(process.env.MONGO_URL as string);
 const db = mongoose.connection;

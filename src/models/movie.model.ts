@@ -9,6 +9,7 @@ const movieSchema = new Schema<SchemaTypes.IMovie>({
   startDate: { type: Date, requires: true },
   endDate: { type: Date, requires: true },
   trailerLink: { type: String, requires: true },
+  imageUrl: { type: String, requires: true },
   status: { type: String, requires: true },
   user: { type: Schema.Types.ObjectId, requires: true },
 });
