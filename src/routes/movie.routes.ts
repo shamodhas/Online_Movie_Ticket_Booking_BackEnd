@@ -1,8 +1,11 @@
 import express from "express";
+import multer from "multer";
 import * as Middleware from "../middlewares";
 import * as MovieController from "./../controllers/movie.controller";
 
 const router = express.Router();
+const storage = multer.memoryStorage(); 
+const upload = multer({ storage: storage });
 
 router.get("/all", MovieController.getAllMovies);
 
@@ -19,6 +22,7 @@ router.post(
   "/",
   Middleware.verifyToken,
   Middleware.verifyIsTheaterEmployee,
+  upload.single('file'),
   MovieController.createMovie
 );
 

@@ -72,40 +72,45 @@ export const authUser = async (req: express.Request, res: express.Response) => {
         res
           .status(401)
           .send(new CustomResponse(401, "Your Account is not activate"));
-      }
-
-      let isMatch = await bcrypt.compare(request_body.password, user.password);
-      if (isMatch) {
-        user.password = "";
-        const expiresIn = "1w";
-
-        jwt.sign(
-          { user },
-          process.env.SECRET as Secret,
-          { expiresIn },
-          (err: any, token: any) => {
-            if (err) {
-              res
-                .status(100)
-                .send(new CustomResponse(500, "Something went wrong"));
-            } else {
-              let res_body = {
-                user: user,
-                accessToken: token,
-              };
-
-              res.status(200).send(new CustomResponse(200, "Access", res_body));
-            }
-          }
-        );
       } else {
-        res.status(401).send(new CustomResponse(401, "Invalid credentials"));
+        let isMatch = await bcrypt.compare(
+          request_body.password,
+          user.password
+        );
+        if (isMatch) {
+          user.password = "";
+          const expiresIn = "1w";
+
+          jwt.sign(
+            { user },
+            process.env.SECRET as Secret,
+            { expiresIn },
+            (err: any, token: any) => {
+              if (err) {
+                res
+                  .status(100)
+                  .send(new CustomResponse(500, "Something went wrong"));
+              } else {
+                let res_body = {
+                  user: user,
+                  accessToken: token,
+                };
+
+                res
+                  .status(200)
+                  .send(new CustomResponse(200, "Access", res_body));
+              }
+            }
+          );
+        } else {
+          res.status(401).send(new CustomResponse(401, "Invalid credentials"));
+        }
       }
     } else {
       res.status(404).send(new CustomResponse(404, "User not found"));
     }
   } catch (error) {
-    res.status(500).send("Internal Server Error");
+    res.status(500).send(new CustomResponse(500, "Internal Server Error"));
   }
 };
 
@@ -224,9 +229,13 @@ export const updateUserStatus = async (
 
       if (updateResult.modifiedCount > 0) {
         exUser.password = "";
-        res.status(200).send(new CustomResponse(200, "User status updated", exUser));
+        res
+          .status(200)
+          .send(new CustomResponse(200, "User status updated", exUser));
       } else {
-        res.status(400).send(new CustomResponse(400, "Fail to update user status"));
+        res
+          .status(400)
+          .send(new CustomResponse(400, "Fail to update user status"));
       }
     } else {
       res.status(400).send(new CustomResponse(400, "Invalid user id"));

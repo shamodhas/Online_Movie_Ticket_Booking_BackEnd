@@ -5,6 +5,7 @@ import * as SchemaTypes from "../types/SchemaTypes";
 import { ObjectId } from "mongodb";
 import UserModel from "../models/user.model";
 import * as RegexValidator from "../util/RegexValidator";
+import s3 from "../config/s3Config";
 
 export const getAllMovies = async (
   req: express.Request,
@@ -101,44 +102,62 @@ export const getMoviesByUser = async (
 
 export const createMovie = async (req: express.Request, res: any) => {
   try {
-    const req_body: any = req.body;
-    const userId = res.tokenData.user._id;
+    if (!req.file) {
+      res.status(400).send(new CustomResponse(400, "Movie image not found"));
+    } else {
+      const req_body: any = req.body;
+      const userId = res.tokenData.user._id;
 
-    if (!req_body.name) {
-      res.status(400).send(new CustomResponse(400, "Invalid movie name"));
-    }
-    // validate data
-    else {
-      let movie: SchemaTypes.IMovie | null = await MovieModel.findOne({
-        name: req_body.name,
-      });
-      if (movie) {
-        res.status(400).send(new CustomResponse(400, "Duplicate movie name"));
-      } else {
-        const movieModel = new MovieModel({
+      if (!req_body.name) {
+        res.status(400).send(new CustomResponse(400, "Invalid movie name"));
+      }
+      // validate data
+      else {
+        let movie: SchemaTypes.IMovie | null = await MovieModel.findOne({
           name: req_body.name,
-          director: req_body.director,
-          language: req_body.language,
-          description: req_body.description,
-          startDate: req_body.startDate,
-          endDate: req_body.endDate,
-          trailerLink: req_body.trailerLink,
-          status: "DEACTIVATE",
-          user: new ObjectId(userId),
         });
-        await movieModel
-          .save()
-          .then((modelRes) => {
-            res
-              .status(200)
-              .send(new CustomResponse(200, "Movie saved", modelRes));
-          })
-          .catch((err) => {
-            res.status(500).send(new CustomResponse(500, "Fail to save movie"));
+        if (movie) {
+          res.status(400).send(new CustomResponse(400, "Duplicate movie name"));
+        } else {
+          const params = {
+            Bucket: "online.mtbs.mern",
+            Key: `${Date.now()}_${req.file.originalname}`,
+            Body: req.file.buffer,
+            ContentType: req.file.mimetype,
+          };
+
+          const s3Response = await s3.upload(params).promise();
+
+          const movieModel = new MovieModel({
+            name: req_body.name,
+            director: req_body.director,
+            language: req_body.language,
+            description: req_body.description,
+            startDate: req_body.startDate,
+            endDate: req_body.endDate,
+            trailerLink: req_body.trailerLink,
+            imageUrl: s3Response.Location,
+            status: "DEACTIVATE",
+            user: new ObjectId(userId),
           });
+          await movieModel
+            .save()
+            .then((modelRes) => {
+              res
+                .status(200)
+                .send(new CustomResponse(200, "Movie saved", modelRes));
+            })
+            .catch((err) => {
+              res
+                .status(500)
+                .send(new CustomResponse(500, "Fail to save movie"));
+            });
+        }
       }
     }
   } catch (err) {
+    console.log(err);
+
     res.status(500).send(new CustomResponse(500, "Internal Server Error"));
   }
 };
@@ -158,7 +177,7 @@ export const updateMovie = async (req: express.Request, res: any) => {
       if (!movie)
         return res.status(404).send(new CustomResponse(404, "Movie not found"));
 
-        if (!(movie.user.toString() === userId || userRole === "ADMIN"))
+      if (!(movie.user.toString() === userId || userRole === "ADMIN"))
         return res
           .status(400)
           .send(new CustomResponse(400, "Movie owner not you"));

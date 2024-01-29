@@ -28,12 +28,14 @@ MERN Stack has been used for this entire project<br/>
 
 ## Table of Contents
 
-- [About](#about)
-- [Technologies](#technologies)
-- [Getting Started](#getting-started)
-- [Frontend Repository](#frontend-repository)
-- [API Documentation](#api-documentation)
-- [Contact](#contact)
+- [Online Movie Ticket Booking System - BackEnd](#online-movie-ticket-booking-system---backend)
+	- [Table of Contents](#table-of-contents)
+	- [About](#about)
+	- [Technologies](#technologies)
+	- [Getting Started With Backend](#getting-started-with-backend)
+	- [Frontend Repository](#frontend-repository)
+	- [API Documentation](#api-documentation)
+	- [Contact](#contact)
 
 ## About
 
@@ -71,6 +73,10 @@ npm start
 - Frontend Repository: [Backend Repo](https://github.com/shamodhaSahan/Online_Movie_Ticket_Booking_FrontEnd)
 
 ## API Documentation
+<!-- https://documenter.getpostman.com/view/28169537/2s9YysC237 -->
+<a href="https://documenter.getpostman.com/view/28169537/2s9YysC237">
+	https://documenter.getpostman.com/view/28169537/2s9YysC237
+</a>
 
 ## Contact
 
