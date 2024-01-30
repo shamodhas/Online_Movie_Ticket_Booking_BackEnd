@@ -60,6 +60,22 @@ export const getMovieByName = async (
   }
 };
 
+export const getMyAllMovies = async (req: express.Request, res: any) => {
+  try {
+    let req_query: any = req.query;
+    let size: number = req_query.size;
+    let page: number = req_query.page;
+    const userId = res.tokenData.user._id;
+    if (!RegexValidator.ValidateObjectId(userId)) {
+      res.status(400).send(new CustomResponse(400, "Invalid user id"));
+    } else {
+      getAllMoviesByUserId(userId, size, page, res);
+    }
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 export const getMoviesByUser = async (
   req: express.Request,
   res: express.Response
@@ -69,34 +85,43 @@ export const getMoviesByUser = async (
     let size: number = req_query.size;
     let page: number = req_query.page;
     const userId = req.params.userId;
-    if (!userId) {
+    if (!RegexValidator.ValidateObjectId(userId)) {
       res.status(400).send(new CustomResponse(400, "Invalid user id"));
     } else {
-      try {
-        let user: any = await UserModel.findById(userId);
-
-        if (!user) {
-          throw new Error("User not found");
-        } else {
-          let movies: any = await MovieModel.find({
-            user: userId,
-          })
-            .limit(size)
-            .skip(size * (page - 1));
-          let documentCount = await MovieModel.countDocuments({
-            user: user._id,
-          });
-          let pageCount = Math.ceil(documentCount / size);
-          res
-            .status(200)
-            .send(new CustomResponse(200, "Movies Founded", movies, pageCount));
-        }
-      } catch (err) {
-        res.status(404).send(new CustomResponse(404, "User not found"));
-      }
+      getAllMoviesByUserId(userId, size, page, res);
     }
   } catch (err) {
     res.status(500).send("Internal Server Error");
+  }
+};
+
+const getAllMoviesByUserId = async (
+  userId: any,
+  size: number,
+  page: number,
+  res: any
+) => {
+  try {
+    let user: any = await UserModel.findById(userId);
+
+    if (!user) {
+      throw new Error("User not found");
+    } else {
+      let movies: any = await MovieModel.find({
+        user: userId,
+      })
+        .limit(size)
+        .skip(size * (page - 1));
+      let documentCount = await MovieModel.countDocuments({
+        user: user._id,
+      });
+      let pageCount = Math.ceil(documentCount / size);
+      return res
+        .status(200)
+        .send(new CustomResponse(200, "Movies Founded", movies, pageCount));
+    }
+  } catch (err) {
+    return res.status(404).send(new CustomResponse(404, "User not found"));
   }
 };
 

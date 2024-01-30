@@ -4,12 +4,19 @@ import * as Middleware from "../middlewares";
 import * as MovieController from "./../controllers/movie.controller";
 
 const router = express.Router();
-const storage = multer.memoryStorage(); 
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 router.get("/all", MovieController.getAllMovies);
 
 router.get("/:name", MovieController.getMovieByName);
+
+router.get(
+  "/my",
+  Middleware.verifyToken,
+  Middleware.verifyIsTheaterEmployee,
+  MovieController.getMyAllMovies
+);
 
 router.get(
   "/user/:userId",
@@ -22,7 +29,7 @@ router.post(
   "/",
   Middleware.verifyToken,
   Middleware.verifyIsTheaterEmployee,
-  upload.single('file'),
+  upload.single("file"),
   MovieController.createMovie
 );
 
