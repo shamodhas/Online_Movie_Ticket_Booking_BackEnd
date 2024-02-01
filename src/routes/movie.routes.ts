@@ -9,14 +9,14 @@ const upload = multer({ storage: storage });
 
 router.get("/all", MovieController.getAllMovies);
 
-router.get("/:name", MovieController.getMovieByName);
-
 router.get(
   "/my",
   Middleware.verifyToken,
   Middleware.verifyIsTheaterEmployee,
   MovieController.getMyAllMovies
 );
+
+router.get("/:name", MovieController.getMovieByName);
 
 router.get(
   "/user/:userId",

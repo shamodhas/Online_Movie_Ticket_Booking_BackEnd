@@ -69,7 +69,28 @@ export const getMyAllMovies = async (req: express.Request, res: any) => {
     if (!RegexValidator.ValidateObjectId(userId)) {
       res.status(400).send(new CustomResponse(400, "Invalid user id"));
     } else {
-      getAllMoviesByUserId(userId, size, page, res);
+      try {
+        let user: any = await UserModel.findById(userId);
+
+        if (!user) {
+          throw new Error("User not found");
+        } else {
+          let movies: any = await MovieModel.find({
+            user: user._id,
+          })
+            .limit(size)
+            .skip(size * (page - 1));
+          let documentCount = await MovieModel.countDocuments({
+            user: user._id,
+          });
+          let pageCount = Math.ceil(documentCount / size);
+          return res
+            .status(200)
+            .send(new CustomResponse(200, "Movies Founded", movies, pageCount));
+        }
+      } catch (err) {
+        return res.status(404).send(new CustomResponse(404, "User not found"));
+      }
     }
   } catch (err) {
     res.status(500).send("Internal Server Error");
@@ -88,7 +109,28 @@ export const getMoviesByUser = async (
     if (!RegexValidator.ValidateObjectId(userId)) {
       res.status(400).send(new CustomResponse(400, "Invalid user id"));
     } else {
-      getAllMoviesByUserId(userId, size, page, res);
+      try {
+        let user: any = await UserModel.findById(userId);
+
+        if (!user) {
+          throw new Error("User not found");
+        } else {
+          let movies: any = await MovieModel.find({
+            user: userId,
+          })
+            .limit(size)
+            .skip(size * (page - 1));
+          let documentCount = await MovieModel.countDocuments({
+            user: user._id,
+          });
+          let pageCount = Math.ceil(documentCount / size);
+          return res
+            .status(200)
+            .send(new CustomResponse(200, "Movies Founded", movies, pageCount));
+        }
+      } catch (err) {
+        return res.status(404).send(new CustomResponse(404, "User not found"));
+      }
     }
   } catch (err) {
     res.status(500).send("Internal Server Error");
