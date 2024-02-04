@@ -214,7 +214,10 @@ export const updateTheater = async (req: express.Request, res: any) => {
         await TheaterModel.findOne({
           name: req_body.name,
         });
-      if (theaterByName && theaterByName._id !== theater._id) {
+      if (
+        theaterByName &&
+        theaterByName._id.toString() !== theater._id.toString()
+      ) {
         res.status(400).send(new CustomResponse(400, "Duplicate theater name"));
       } else {
         const updateResult: any = await TheaterModel.updateOne(
