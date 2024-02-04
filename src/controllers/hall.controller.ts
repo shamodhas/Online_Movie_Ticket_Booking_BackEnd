@@ -154,7 +154,6 @@ export const saveHall = async (req: express.Request, res: any) => {
         res.status(400).send(new CustomResponse(400, "Duplicate hall number"));
       } else {
         let theater: any = await TheaterModel.findById(theaterId);
-        console.log(theater);
 
         if (theater) {
           const hallModel = new HallModel({
@@ -205,15 +204,27 @@ export const updateHall = async (req: express.Request, res: any) => {
       hall.hallNumber = req_body.hallNumber || hall.hallNumber;
       hall.theater = req_body.theater || hall.theater;
 
-      const updateResult: any = await HallModel.updateOne(
-        { _id: hallId },
-        hall
-      );
+      let hallByHallNumber: SchemaTypes.ITheater | null =
+        await HallModel.findOne({
+          hallNumber: req_body.hallNumber,
+        });
 
-      if (updateResult.modifiedCount > 0) {
-        res.status(200).send(new CustomResponse(200, "Hall updated", hall));
+      if (
+        hallByHallNumber &&
+        hallByHallNumber._id.toString() !== hall._id.toString()
+      ) {
+        res.status(400).send(new CustomResponse(400, "Duplicate hall number"));
       } else {
-        res.status(400).send(new CustomResponse(400, "Fail to update hall"));
+        const updateResult: any = await HallModel.updateOne(
+          { _id: hallId },
+          hall
+        );
+
+        if (updateResult.modifiedCount > 0) {
+          res.status(200).send(new CustomResponse(200, "Hall updated", hall));
+        } else {
+          res.status(400).send(new CustomResponse(400, "Fail to update hall"));
+        }
       }
     } else {
       res.status(400).send(new CustomResponse(400, "Invalid hall id"));
