@@ -36,6 +36,43 @@ export const getAllTheaters = async (
   }
 };
 
+export const getMyAllTheaters = async (req: express.Request, res: any) => {
+  try {
+    let req_query: any = req.query;
+    let size: number = req_query.size;
+    let page: number = req_query.page;
+    const userId = res.tokenData.user._id;
+    if (!RegexValidator.ValidateObjectId(userId)) {
+      res.status(400).send(new CustomResponse(400, "Invalid user id"));
+    } else {
+      try {
+        let user: any = await UserModel.findById(userId);
+
+        if (!user) {
+          throw new Error("User not found");
+        } else {
+          let theaters: any = await TheaterModel.find({
+            user: user._id,
+          })
+            .limit(size)
+            .skip(size * (page - 1));
+          let documentCount = await TheaterModel.countDocuments({
+            user: user._id,
+          });
+          let pageCount = Math.ceil(documentCount / size);
+          return res
+            .status(200)
+            .send(new CustomResponse(200, "Theater Founded", theaters, pageCount));
+        }
+      } catch (err) {
+        return res.status(404).send(new CustomResponse(404, "User not found"));
+      }
+    }
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 export const getTheaterByName = async (
   req: express.Request,
   res: express.Response

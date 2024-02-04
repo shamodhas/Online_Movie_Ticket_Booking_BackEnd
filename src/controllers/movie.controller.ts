@@ -37,29 +37,6 @@ export const getAllMovies = async (
   }
 };
 
-export const getMovieByName = async (
-  req: express.Request,
-  res: express.Response
-) => {
-  try {
-    const name = req.params.name;
-    if (!name) {
-      res.status(400).send(new CustomResponse(400, "Invalid movie name"));
-    } else {
-      let movie: SchemaTypes.IMovie | null = await MovieModel.findOne({
-        name,
-      });
-      if (movie) {
-        res.status(200).send(new CustomResponse(200, "Movie Founded", movie));
-      } else {
-        res.status(404).send(new CustomResponse(404, "Movie not found"));
-      }
-    }
-  } catch (err) {
-    res.status(500).send("Internal Server Error");
-  }
-};
-
 export const getMyAllMovies = async (req: express.Request, res: any) => {
   try {
     let req_query: any = req.query;
@@ -90,6 +67,29 @@ export const getMyAllMovies = async (req: express.Request, res: any) => {
         }
       } catch (err) {
         return res.status(404).send(new CustomResponse(404, "User not found"));
+      }
+    }
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+export const getMovieByName = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const name = req.params.name;
+    if (!name) {
+      res.status(400).send(new CustomResponse(400, "Invalid movie name"));
+    } else {
+      let movie: SchemaTypes.IMovie | null = await MovieModel.findOne({
+        name,
+      });
+      if (movie) {
+        res.status(200).send(new CustomResponse(200, "Movie Founded", movie));
+      } else {
+        res.status(404).send(new CustomResponse(404, "Movie not found"));
       }
     }
   } catch (err) {

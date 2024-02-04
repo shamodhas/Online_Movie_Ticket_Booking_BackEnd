@@ -5,6 +5,13 @@ import * as TheaterController from "./../controllers/theater.controller";
 const router = express.Router();
 
 router.get("/all", TheaterController.getAllTheaters);
+  
+router.get(
+  "/my",
+  Middleware.verifyToken,
+  Middleware.verifyIsTheaterEmployee,
+  TheaterController.getMyAllTheaters
+);
 
 router.get("/:name", TheaterController.getTheaterByName);
 
