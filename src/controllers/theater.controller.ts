@@ -62,7 +62,9 @@ export const getMyAllTheaters = async (req: express.Request, res: any) => {
           let pageCount = Math.ceil(documentCount / size);
           return res
             .status(200)
-            .send(new CustomResponse(200, "Theater Founded", theaters, pageCount));
+            .send(
+              new CustomResponse(200, "Theater Founded", theaters, pageCount)
+            );
         }
       } catch (err) {
         return res.status(404).send(new CustomResponse(404, "User not found"));
@@ -195,27 +197,40 @@ export const updateTheater = async (req: express.Request, res: any) => {
         return res
           .status(404)
           .send(new CustomResponse(404, "Theater not found"));
-          
-      if (!(theater.user.toString() === userId || userRole === "ADMIN"))
+
+      if (!(theater.user.toString() === userId || userRole === "ADMIN")) {
         return res
           .status(400)
           .send(new CustomResponse(400, "Theater owner not you"));
+      }
+
+      //validate data
 
       theater.name = req_body.name || theater.name;
       theater.location = req_body.location || theater.location;
       theater.mobileNumber = req_body.mobileNumber || theater.mobileNumber;
 
-      const updateResult: any = await TheaterModel.updateOne(
-        { _id: theaterId },
-        theater
-      );
-
-      if (updateResult.modifiedCount > 0) {
-        res
-          .status(200)
-          .send(new CustomResponse(200, "Theater updated", theater));
+      let theaterByName: SchemaTypes.ITheater | null =
+        await TheaterModel.findOne({
+          name: req_body.name,
+        });
+      if (theaterByName && theaterByName._id !== theater._id) {
+        res.status(400).send(new CustomResponse(400, "Duplicate theater name"));
       } else {
-        res.status(400).send(new CustomResponse(400, "Fail to update theater"));
+        const updateResult: any = await TheaterModel.updateOne(
+          { _id: theaterId },
+          theater
+        );
+
+        if (updateResult.modifiedCount > 0) {
+          res
+            .status(200)
+            .send(new CustomResponse(200, "Theater updated", theater));
+        } else {
+          res
+            .status(400)
+            .send(new CustomResponse(400, "Fail to update theater"));
+        }
       }
     } else {
       res.status(400).send(new CustomResponse(400, "Invalid theater id"));
