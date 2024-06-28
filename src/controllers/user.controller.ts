@@ -68,7 +68,7 @@ export const authUser = async (req: express.Request, res: express.Response) => {
       email: request_body.email,
     });
     if (user) {
-      if (user.status !== "Active") {
+      if (!user.status) {
         res
           .status(401)
           .send(new CustomResponse(401, "Your Account is not activate"));
@@ -144,7 +144,7 @@ export const registeredUser = async (
             email: req_body.email,
             password: hash,
             mobileNumber: req_body.mobileNumber,
-            status: req_body.role === "CUSTOMER" ? "Active" : "Not Active",
+            status: req_body.role === "CUSTOMER" ? true : false,
             role: req_body.role,
           });
           let user: SchemaTypes.IUser | null = await userModel.save();

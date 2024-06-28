@@ -6,7 +6,7 @@ const userSchema = new Schema<SchemaTypes.IUser>({
   email: { type: String, required: true },
   password: { type: String, required: true },
   mobileNumber: { type: String, required: true },
-  status: { type: String, required: true },
+  status: { type: Boolean, required: true },
   role: { type: String, required: true },
 });
 

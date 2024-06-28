@@ -194,7 +194,7 @@ export const createMovie = async (req: express.Request, res: any) => {
           };
 
           const s3Response = await s3.upload(params).promise();
-
+// s3Response need check
           const movieModel = new MovieModel({
             name: req_body.name,
             director: req_body.director,
