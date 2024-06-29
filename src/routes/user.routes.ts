@@ -25,6 +25,18 @@
 
 // export default router;
 
+// router.post("/auth", UserController.authUser);
+
+// router.post("/", UserController.registeredUser);
+
+// router.put("/:id", Middleware.verifyToken, UserController.updateUser);
+
+// router.put(
+//   "/status/:id",
+//   Middleware.verifyToken,
+//   Middleware.verifyIsAdmin,
+//   UserController.updateUserStatus
+// );
 
 import express from 'express';
 import * as UserController from '../controllers/user.controller';

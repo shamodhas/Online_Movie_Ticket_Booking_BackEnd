@@ -14,20 +14,24 @@
 // export default UserModel;
 
 
-import mongoose, { Schema, Document } from 'mongoose';
-
-export interface User extends Document {
-    username: string;
-    email: string;
-    password: string;
-    role: string;
-}
+import mongoose, { Schema } from "mongoose"
+import { IUser } from "types/SchemaTypes"
 
 const UserSchema: Schema = new Schema({
-    username: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { type: String, enum: ['guest', 'customer', 'theaterOwner', 'admin'], default: 'guest' }
-});
+  username: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: {
+    type: String,
+    required: true,
+    enum: ["Admin", "Customer", "TheaterOwner"],
+    default: "Customer"
+  },
+  approvalStatus: {
+    type: String,
+    enum: ["approved", "pending", "rejected"],
+    default: "pending"
+  }
+})
 
-export default mongoose.model<User>('User', UserSchema);
+export default mongoose.model<IUser>("User", UserSchema)
