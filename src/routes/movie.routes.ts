@@ -56,18 +56,35 @@
 
 // export default router;
 
+import express from "express"
+import * as MovieController from "../controllers/movie.controller"
+import {
+  authenticateUser,
+  authorizeAdmin,
+  authorizeTheaterOwner
+} from "../middlewares/auth.middleware"
 
+const router = express.Router()
 
-import express from 'express';
-import * as MovieController from '../controllers/movie.controller';
-import { authenticateUser, authorizeAdmin } from '../middlewares/auth.middleware';
+router.get("/", MovieController.getAllMovies) //
+router.get("/:movieId", MovieController.getMovieById) //
+router.post(
+  "/",
+  authenticateUser,
+  authorizeTheaterOwner,
+  MovieController.createMovie
+) // 
+router.put(
+  "/:movieId",
+  authenticateUser,
+  authorizeTheaterOwner,
+  MovieController.updateMovie
+) //
+router.delete(
+  "/:movieId",
+  authenticateUser,
+  authorizeTheaterOwner,
+  MovieController.deleteMovie
+) // 
 
-const router = express.Router();
-
-router.get('/', MovieController.getAllMovies);
-router.get('/:movieId', MovieController.getMovieById);
-router.post('/', authenticateUser, authorizeAdmin, MovieController.createMovie);
-router.put('/:movieId', authenticateUser, authorizeAdmin, MovieController.updateMovie);
-router.delete('/:movieId', authenticateUser, authorizeAdmin, MovieController.deleteMovie);
-
-export default router;
+export default router

@@ -5,7 +5,7 @@
 // const router = express.Router();
 
 // router.get("/all", TheaterController.getAllTheaters);
-  
+
 // router.get(
 //   "/my",
 //   Middleware.verifyToken,
@@ -45,18 +45,35 @@
 
 // export default router;
 
+import express from "express"
+import * as TheaterController from "../controllers/theater.controller"
+import {
+  authenticateUser,
+  authorizeAdmin,
+  authorizeTheaterOwner
+} from "../middlewares/auth.middleware"
 
+const router = express.Router()
 
-import express from 'express';
-import * as TheaterController from '../controllers/theater.controller';
-import { authenticateUser, authorizeAdmin } from '../middlewares/auth.middleware';
+router.get("/", TheaterController.getAllTheaters) // 
+router.get("/:theaterId", TheaterController.getTheaterById) // 
+router.post(
+  "/",
+  authenticateUser,
+  authorizeTheaterOwner,
+  TheaterController.createTheater
+) // 
+router.put(
+  "/:theaterId",
+  authorizeTheaterOwner,
+  authorizeTheaterOwner,
+  TheaterController.updateTheater
+) //
+router.delete(
+  "/:theaterId",
+  authenticateUser,
+  authorizeTheaterOwner,
+  TheaterController.deleteTheater
+) // 
 
-const router = express.Router();
-
-router.get('/', TheaterController.getAllTheaters);
-router.get('/:theaterId', TheaterController.getTheaterById);
-router.post('/', authenticateUser, authorizeAdmin, TheaterController.createTheater);
-router.put('/:theaterId', authenticateUser, authorizeAdmin, TheaterController.updateTheater);
-router.delete('/:theaterId', authenticateUser, authorizeAdmin, TheaterController.deleteTheater);
-
-export default router;
+export default router

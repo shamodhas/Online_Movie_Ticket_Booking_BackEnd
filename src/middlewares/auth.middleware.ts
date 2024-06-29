@@ -64,7 +64,7 @@ export const authorizeAdmin = (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.user?.role !== "admin") {
+  if (req.user?.role !== "Admin") {
     return res.status(403).json({ message: "Access denied" })
   }
   next()
@@ -75,7 +75,7 @@ export const authorizeTheaterOwner = (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.user?.role !== "theaterOwner") {
+  if (req.user?.role !== "TheaterOwner") {
     return res.status(403).json({ message: "Access denied" })
   }
   next()
@@ -86,7 +86,7 @@ export const authorizeCustomer = (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.user?.role !== "customer") {
+  if (req.user?.role !== "Customer") {
     return res.status(403).json({ message: "Access denied" })
   }
   next()

@@ -21,19 +21,25 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface Movie extends Document {
-    title: string;
-    description: string;
-    releaseDate: Date;
-    director: string;
-    imageUrl?: string;
+  title: string
+  description: string
+  releaseDate: Date
+  director: string
+  imageUrl?: string
+  status: string
 }
 
 const MovieSchema: Schema = new Schema({
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    releaseDate: { type: Date, required: true },
-    director: { type: String, required: true },
-    imageUrl: { type: String },
-});
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  releaseDate: { type: Date, required: true },
+  director: { type: String, required: true },
+  imageUrl: { type: String },
+  status: {
+    type: String,
+    enum: ["upcoming", "nowShowing", "past"],
+    default: "upcoming"
+  }
+})
 
 export default mongoose.model<Movie>('Movie', MovieSchema);

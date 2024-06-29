@@ -274,9 +274,8 @@
 //   }
 // };
 
-
-import { Request, Response } from 'express';
-import User from '../models/user.model';
+import { Request, Response } from "express"
+import User from "../models/user.model"
 import express from "express"
 import UserModel from "../models/user.model"
 import CustomResponse from "../dtos/custom.response"
@@ -286,61 +285,73 @@ import jwt, { Secret } from "jsonwebtoken"
 import bcrypt from "bcryptjs"
 
 export const getAllUsers = async (req: Request, res: Response) => {
-    try {
-        const users = await User.find();
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-};
+  let req_query: any = req.query
+  let size: number = req_query.size
+  let page: number = req_query.page
+
+  try {
+    const users = await User.find()
+      .limit(size)
+      .skip(size * (page - 1))
+
+    let documentCount = await User.countDocuments()
+    let pageCount = Math.ceil(documentCount / size)
+
+    return res
+      .status(200)
+      .send(
+        new CustomResponse(
+          200,
+          "User found successfully",
+          users,
+          page,
+          pageCount
+        )
+      )
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
 
 export const getUserById = async (req: Request, res: Response) => {
-    try {
-        const user = await User.findById(req.params.userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+  try {
+    const user = await User.findById(req.params.userId)
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
     }
-};
+    res.json(user)
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
 
 export const createUser = async (req: Request, res: Response) => {
-    const { username, email, password, role } = req.body;
+  const { username, email, password, role } = req.body
 
-    try {
-        const newUser = new User({ username, email, password, role });
-        await newUser.save();
-        res.status(201).json(newUser);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-};
+  try {
+    const newUser = new User({ username, email, password, role })
+    await newUser.save()
+    res.status(201).json(newUser)
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
 
 export const updateUser = async (req: Request, res: Response) => {
-    try {
-        const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, { new: true });
-        if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        res.json(updatedUser);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.userId,
+      req.body,
+      { new: true }
+    )
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" })
     }
-};
-
-export const deleteUser = async (req: Request, res: Response) => {
-    try {
-        const deletedUser = await User.findByIdAndDelete(req.params.userId);
-        if (!deletedUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        res.json({ message: 'User deleted' });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-};
+    res.json(updatedUser)
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
 
 export const getAllUser = async (
   req: express.Request,
@@ -578,31 +589,43 @@ export const getUserByEmail = async (
 //   }
 // }
 
-export const deleteUser = async (
-  req: express.Request,
-  res: express.Response
-) => {
+export const deleteUser = async (req: Request, res: Response) => {
   try {
-    const userId = req.params.id
-    if (RegexValidator.ValidateObjectId(userId)) {
-      const existingUser = await UserModel.findById(userId)
-      if (existingUser) {
-        // user usage check
-
-        const deleteResult = await UserModel.deleteOne({ _id: userId })
-        if (deleteResult.deletedCount && deleteResult.deletedCount > 0) {
-          res.status(200).send(new CustomResponse(200, "User deleted"))
-        } else {
-          res.status(400).send(new CustomResponse(400, "Fail to delete user"))
-        }
-      } else {
-        res.status(404).send(new CustomResponse(404, "User not found"))
-      }
-    } else {
-      res.status(400).send(new CustomResponse(400, "Invalid user id"))
+    const deletedUser = await User.findByIdAndDelete(req.params.userId)
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" })
     }
+    res.json({ message: "User deleted" })
   } catch (error) {
-    console.error(error)
-    res.status(500).json(new CustomResponse(500, "Internal Server Error"))
+    res.status(500).json({ message: "Server error" })
   }
 }
+
+// export const deleteUser = async (
+//   req: express.Request,
+//   res: express.Response
+// ) => {
+//   try {
+//     const userId = req.params.id
+//     if (RegexValidator.ValidateObjectId(userId)) {
+//       const existingUser = await UserModel.findById(userId)
+//       if (existingUser) {
+//         // user usage check
+
+//         const deleteResult = await UserModel.deleteOne({ _id: userId })
+//         if (deleteResult.deletedCount && deleteResult.deletedCount > 0) {
+//           res.status(200).send(new CustomResponse(200, "User deleted"))
+//         } else {
+//           res.status(400).send(new CustomResponse(400, "Fail to delete user"))
+//         }
+//       } else {
+//         res.status(404).send(new CustomResponse(404, "User not found"))
+//       }
+//     } else {
+//       res.status(400).send(new CustomResponse(400, "Invalid user id"))
+//     }
+//   } catch (error) {
+//     console.error(error)
+//     res.status(500).json(new CustomResponse(500, "Internal Server Error"))
+//   }
+// }
