@@ -16,6 +16,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
   try {
     let user = await User.findOne({ username })
+    console.log(user)
 
     if (!user) {
       return res
@@ -39,9 +40,15 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const accessToken = generateAccessToken(username)
 
-    return res
-      .status(200)
-      .send(new CustomResponse(200, "Access", { token: accessToken }))
+    return res.status(200).send(
+      new CustomResponse(200, "Access", {
+        name: user.username,
+        email: user.email,
+        role: user.role,
+        status: user.approvalStatus,
+        token: accessToken
+      })
+    )
   } catch (error) {
     console.error(error)
     return res.status(500).send(new CustomResponse(500, "Server error"))
