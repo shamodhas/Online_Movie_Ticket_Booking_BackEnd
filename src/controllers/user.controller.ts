@@ -281,7 +281,6 @@ import UserModel from "../models/user.model"
 import CustomResponse from "../dtos/custom.response"
 import * as SchemaTypes from "../types/SchemaTypes"
 import * as RegexValidator from "../util/RegexValidator"
-import jwt, { Secret } from "jsonwebtoken"
 import bcrypt from "bcryptjs"
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -302,7 +301,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
       .send(
         new CustomResponse(
           200,
-          "User found successfully",
+          "Data found successfully",
           users,
           page,
           pageCount

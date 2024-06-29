@@ -279,63 +279,87 @@
 //   }
 // };
 
-
-import { Request, Response } from 'express';
-import Theater from '../models/theater.model';
+import { Request, Response } from "express"
+import Theater from "../models/theater.model"
+import CustomResponse from "./../dtos/custom.response"
 
 export const getAllTheaters = async (req: Request, res: Response) => {
-    try {
-        const theaters = await Theater.find();
-        res.json(theaters);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-};
+  let req_query: any = req.query
+  let size: number = req_query.size
+  let page: number = req_query.page
+
+  try {
+    const theaters = await Theater.find()
+      .limit(size)
+      .skip(size * (page - 1))
+
+    let documentCount = await Theater.countDocuments()
+    let pageCount = Math.ceil(documentCount / size)
+
+    return res
+      .status(200)
+      .send(
+        new CustomResponse(
+          200,
+          "User found successfully",
+          theaters,
+          page,
+          pageCount
+        )
+      )
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
 
 export const getTheaterById = async (req: Request, res: Response) => {
-    try {
-        const theater = await Theater.findById(req.params.theaterId);
-        if (!theater) {
-            return res.status(404).json({ message: 'Theater not found' });
-        }
-        res.json(theater);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+  try {
+    const theater = await Theater.findById(req.params.theaterId)
+    if (!theater) {
+      return res.status(404).json({ message: "Theater not found" })
     }
-};
+    res.json(theater)
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
 
 export const createTheater = async (req: Request, res: Response) => {
-    const { name, location, seats } = req.body;
+  const { name, location, seats } = req.body
 
-    try {
-        const newTheater = new Theater({ name, location, seats });
-        await newTheater.save();
-        res.status(201).json(newTheater);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-};
+  try {
+    const newTheater = new Theater({ name, location, seats })
+    await newTheater.save()
+    res.status(201).json(newTheater)
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
 
 export const updateTheater = async (req: Request, res: Response) => {
-    try {
-        const updatedTheater = await Theater.findByIdAndUpdate(req.params.theaterId, req.body, { new: true });
-        if (!updatedTheater) {
-            return res.status(404).json({ message: 'Theater not found' });
-        }
-        res.json(updatedTheater);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+  try {
+    const updatedTheater = await Theater.findByIdAndUpdate(
+      req.params.theaterId,
+      req.body,
+      { new: true }
+    )
+    if (!updatedTheater) {
+      return res.status(404).json({ message: "Theater not found" })
     }
-};
+    res.json(updatedTheater)
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
 
 export const deleteTheater = async (req: Request, res: Response) => {
-    try {
-        const deletedTheater = await Theater.findByIdAndDelete(req.params.theaterId);
-        if (!deletedTheater) {
-            return res.status(404).json({ message: 'Theater not found' });
-        }
-        res.json({ message: 'Theater deleted' });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+  try {
+    const deletedTheater = await Theater.findByIdAndDelete(req.params.theaterId)
+    if (!deletedTheater) {
+      return res.status(404).json({ message: "Theater not found" })
     }
-};
+    res.json({ message: "Theater deleted" })
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}

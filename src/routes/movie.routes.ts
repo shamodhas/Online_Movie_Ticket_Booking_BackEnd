@@ -73,7 +73,7 @@ router.post(
   authenticateUser,
   authorizeTheaterOwner,
   MovieController.createMovie
-) // 
+) //
 router.put(
   "/:movieId",
   authenticateUser,
@@ -85,6 +85,6 @@ router.delete(
   authenticateUser,
   authorizeTheaterOwner,
   MovieController.deleteMovie
-) // 
+) //
 
 export default router
