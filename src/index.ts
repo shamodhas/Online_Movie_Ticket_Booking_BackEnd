@@ -12,6 +12,7 @@ import BookingRoutes from "./routes/booking.routes"
 import cors from "cors"
 
 dotenv.config()
+
 const port = 8070
 const app = express()
 
@@ -27,29 +28,30 @@ app.use("/api/bookings", BookingRoutes)
 
 const URI = process.env.MONGO_URL as string
 
-// mongoose.connect(URI)
-// const db = mongoose.connection;
+mongoose.connect(URI)
+const db = mongoose.connection
 
-// db.on("error", (error) => {
-//   console.log("DB Connection Fail, Error : ", error);
-// });
+db.on("error", (error) => {
+  console.log("DB Connection Fail, Error : ", error)
+})
 
-// db.on("open", (error) => {
-//   console.log("DB Connected Successfully");
-// });
-const connectDB = async () => {
-  try {
-    await mongoose.connect(URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true
-    } as any)
-    console.log("MongoDB connected")
-  } catch (error: any) {
-    console.error("Error connecting to MongoDB:", error.message)
-    process.exit(1)
-  }
-}
+db.on("open", (error) => {
+  console.log("DB Connected Successfully")
+})
+
+// const connectDB = async () => {
+//   try {
+//     await mongoose.connect(URI, {
+//       useNewUrlParser: true,
+//       useUnifiedTopology: true,
+//       useCreateIndex: true
+//     } as any)
+//     console.log("MongoDB connected")
+//   } catch (error: any) {
+//     console.error("Error connecting to MongoDB:", error.message)
+//     process.exit(1)
+//   }
+// }
 
 app.listen(port, () => {
   console.log("Server started on port " + port)

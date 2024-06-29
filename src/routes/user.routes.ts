@@ -8,18 +8,18 @@ router.get("/all", Middleware.verifyToken, UserController.getAllUser);
 
 router.get("/:email", UserController.getUserByEmail);
 
-router.post("/auth", UserController.authUser);
+// router.post("/auth", UserController.authUser);
 
-router.post("/", UserController.registeredUser);
+// router.post("/", UserController.registeredUser);
 
-router.put("/:id", Middleware.verifyToken, UserController.updateUser);
+// router.put("/:id", Middleware.verifyToken, UserController.updateUser);
 
-router.put(
-  "/status/:id",
-  Middleware.verifyToken,
-  Middleware.verifyIsAdmin,
-  UserController.updateUserStatus
-);
+// router.put(
+//   "/status/:id",
+//   Middleware.verifyToken,
+//   Middleware.verifyIsAdmin,
+//   UserController.updateUserStatus
+// );
 
 router.delete("/:id", Middleware.verifyToken, UserController.deleteUser);
 
