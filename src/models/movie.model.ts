@@ -17,10 +17,10 @@
 // const MovieModel = model("Movie", movieSchema);
 // export default MovieModel;
 
-
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose"
 
 export interface Movie extends Document {
+  userId: mongoose.Types.ObjectId
   title: string
   description: string
   releaseDate: Date
@@ -30,6 +30,7 @@ export interface Movie extends Document {
 }
 
 const MovieSchema: Schema = new Schema({
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
   releaseDate: { type: Date, required: true },
@@ -42,4 +43,4 @@ const MovieSchema: Schema = new Schema({
   }
 })
 
-export default mongoose.model<Movie>('Movie', MovieSchema);
+export default mongoose.model<Movie>("Movie", MovieSchema)

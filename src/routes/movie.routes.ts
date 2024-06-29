@@ -67,6 +67,7 @@ import {
 const router = express.Router()
 
 router.get("/", MovieController.getAllMovies) //
+router.get("/me", MovieController.getAllMyMovies) //
 router.get("/:movieId", MovieController.getMovieById) //
 router.post(
   "/",
