@@ -13,6 +13,7 @@
 // const UserModel = model("User", userSchema);
 // export default UserModel;
 
+
 import mongoose, { Schema } from "mongoose"
 import { IUser } from "types/SchemaTypes"
 
