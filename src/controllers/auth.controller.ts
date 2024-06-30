@@ -42,6 +42,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     return res.status(200).send(
       new CustomResponse(200, "Access", {
+        userId: user._id,
         name: user.username,
         email: user.email,
         role: user.role,
