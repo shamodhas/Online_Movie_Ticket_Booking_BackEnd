@@ -30,7 +30,7 @@ export interface Movie extends Document {
 }
 
 const MovieSchema: Schema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  userId: { type: Schema.Types.ObjectId, required: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
   releaseDate: { type: Date, required: true },

@@ -63,8 +63,12 @@ import {
   authorizeAdmin,
   authorizeTheaterOwner
 } from "../middlewares/auth.middleware"
+import multer from "multer"
 
 const router = express.Router()
+
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
 
 router.get("/", MovieController.getAllMovies) //
 router.get("/me", MovieController.getAllMyMovies) //
@@ -73,8 +77,10 @@ router.post(
   "/",
   authenticateUser,
   authorizeTheaterOwner,
+  upload.single("file"),
   MovieController.createMovie
 ) //
+
 router.put(
   "/:movieId",
   authenticateUser,

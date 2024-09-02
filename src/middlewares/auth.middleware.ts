@@ -43,9 +43,9 @@ export const authenticateUser = async (
 
   try {
     const decoded = jwt.verify(token, config.JWT_SECRET as Secret) as {
-      userId?: string
+      username?: string
     }
-    const user = await User.findById(decoded.userId)
+    const user = await User.findOne({ username: decoded.username })
 
     if (!user) {
       return res.status(401).json({ message: "User not found" })

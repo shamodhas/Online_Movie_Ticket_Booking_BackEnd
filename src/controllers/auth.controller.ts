@@ -125,7 +125,7 @@ export const refreshToken = async (req: Request, res: Response) => {
       username: string
     }
 
-    const user = await User.findById(decoded.username)
+    const user = await User.findOne({ username: decoded.username })
 
     if (!user) {
       return res

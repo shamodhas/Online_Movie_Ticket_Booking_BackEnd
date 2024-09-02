@@ -5,35 +5,8 @@ import multer from "multer"
 import path from "path"
 import fs from "fs"
 import mongoose from "mongoose"
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, "../uploads/"))
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname))
-  }
-})
-
-const upload = multer({
-  storage: storage,
-  fileFilter: function (req, file, cb) {
-    const filetypes = /jpeg|jpg|png/
-    const mimetype = filetypes.test(file.mimetype)
-    const extname = filetypes.test(
-      path.extname(file.originalname).toLowerCase()
-    )
-    if (mimetype && extname) {
-      return cb(null, true)
-    }
-    cb(
-      new Error(
-        "Error: File upload only supports the following filetypes - " +
-          filetypes
-      )
-    )
-  }
-}).single("image")
+import { ObjectId } from "mongodb"
+import s3 from "../config/s3Config"
 
 export const getAllMovies = async (req: Request, res: Response) => {
   let req_query: any = req.query
@@ -107,66 +80,55 @@ export const getMovieById = async (req: Request, res: Response) => {
 }
 
 export const createMovie = async (req: Request, res: Response) => {
-  upload(req, res, async function (err) {
-    if (err instanceof multer.MulterError) {
-      // A Multer error occurred when uploading
-      return res
-        .status(400)
-        .json({ message: "File upload error", error: err.message })
-    } else if (err) {
-      // Any other unknown error occurred during upload
-      return res
-        .status(500)
-        .json({ message: "Unknown error occurred", error: err })
+  console.log(req)
+  if (!req.file) {
+    return res.status(400).json({ message: "File upload is required." })
+  }
+
+  const { userId, title, description, releaseDate, director, status } = req.body
+
+  // Validate required fields
+  if (!userId || !title || !description || !releaseDate || !director) {
+    return res
+      .status(400)
+      .json({ message: "All required fields must be provided." })
+  }
+
+  try {
+    const params = {
+      Bucket: "online.mtbs.mern",
+      Key: `${Date.now()}_${req.file.originalname}`,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype
     }
 
-    // If no file is uploaded
-    if (!req.file) {
-      return res.status(400).json({ message: "File upload is required." })
+    const s3Response = await s3.upload(params).promise()
+
+    // Create a new movie document
+    const newMovie = new Movie({
+      userId: new ObjectId(userId),
+      title,
+      description,
+      releaseDate,
+      director,
+      imageUrl: s3Response.Location,
+      status
+    })
+
+    // Save the movie to the database
+    await newMovie.save()
+
+    // Send a successful response
+    return res
+      .status(201)
+      .send(new CustomResponse(201, "Movie created successfully", newMovie))
+  } catch (error) {
+    // Delete uploaded file if saving to database fails
+    if (req.file) {
+      fs.unlinkSync(path.join(__dirname, "../uploads/", req.file.filename))
     }
-
-    const { userId, title, description, releaseDate, director, status } =
-      req.body
-
-    // Validate required fields
-    if (!userId || !title || !description || !releaseDate || !director) {
-      return res
-        .status(400)
-        .json({ message: "All required fields must be provided." })
-    }
-
-    try {
-      let imageUrl: string
-
-      // Store relative path to uploaded file
-      imageUrl = "/uploads/" + req.file.filename
-      const userObjectId = new mongoose.Types.ObjectId(userId)
-      // Create a new movie document
-      const newMovie = new Movie({
-        userId: userObjectId,
-        title,
-        description,
-        releaseDate,
-        director,
-        imageUrl,
-        status
-      })
-
-      // Save the movie to the database
-      await newMovie.save()
-
-      // Send a successful response
-      return res
-        .status(201)
-        .send(new CustomResponse(201, "Movie created successfully", newMovie))
-    } catch (error) {
-      // Delete uploaded file if saving to database fails
-      if (req.file) {
-        fs.unlinkSync(path.join(__dirname, "../uploads/", req.file.filename))
-      }
-      res.status(500).json({ message: "Server error", error })
-    }
-  })
+    res.status(500).json({ message: "Server error", error })
+  }
 }
 
 export const updateMovie = async (req: Request, res: Response) => {
