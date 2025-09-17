@@ -26,4 +26,7 @@ admin.initializeApp({
   storageBucket: "movie-booking-system-images.appspot.com" // your bucket
 })
 
-export default admin
+const bucket = admin.storage().bucket()
+
+export default bucket
+// gs://hyper-tech-425e4.firebasestorage.app/movie-booking-system-images
