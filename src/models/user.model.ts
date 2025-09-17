@@ -1,37 +1,36 @@
-// import { Document, Schema, model } from "mongoose";
-// import * as SchemaTypes from "../types/SchemaTypes";
+import mongoose, { Schema, Document } from "mongoose"
 
-// const userSchema = new Schema<SchemaTypes.IUser>({
-//   name: { type: String, required: true },
-//   email: { type: String, required: true },
-//   password: { type: String, required: true },
-//   mobileNumber: { type: String, required: true },
-//   status: { type: Boolean, required: true },
-//   role: { type: String, required: true },
-// });
+export interface IUser extends Document {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  password: string
+  profileImage?: string
+  role: "Admin" | "Customer" | "TheaterOwner"
+  approvalStatus: "pending" | "approved" | "rejected"
+}
 
-// const UserModel = model("User", userSchema);
-// export default UserModel;
-
-
-import mongoose, { Schema } from "mongoose"
-import { IUser } from "types/SchemaTypes"
-
-const UserSchema: Schema = new Schema({
-  username: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: {
-    type: String,
-    required: true,
-    enum: ["Admin", "Customer", "TheaterOwner"],
-    default: "Customer"
+const userSchema = new Schema<IUser>(
+  {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    phone: { type: String, required: true },
+    password: { type: String, required: true },
+    profileImage: { type: String },
+    role: {
+      type: String,
+      enum: ["Admin", "Customer", "TheaterOwner"],
+      default: "Customer"
+    },
+    approvalStatus: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "approved"
+    }
   },
-  approvalStatus: {
-    type: String,
-    enum: ["approved", "pending", "rejected"],
-    default: "pending"
-  }
-})
+  { timestamps: true }
+)
 
-export default mongoose.model<IUser>("User", UserSchema)
+export default mongoose.model<IUser>("User", userSchema)

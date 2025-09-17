@@ -2,10 +2,14 @@ import { Document, ObjectId } from "mongoose"
 
 export interface IUser extends Document {
   username: string
+  firstName: string
+  lastName: string
   email: string
+  phone: string
   password: string
   role: "Admin" | "Customer" | "TheaterOwner"
-  approvalStatus: "approved" | "pending" | "rejected"
+  approvalStatus: "pending" | "approved"
+  profileImage?: string
 }
 
 export interface IMovie extends Document {
