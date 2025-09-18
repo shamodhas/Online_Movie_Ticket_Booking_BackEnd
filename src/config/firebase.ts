@@ -13,7 +13,6 @@ if (
   throw new Error("Missing Firebase environment variables")
 }
 
-// Create service account object
 const serviceAccount: any = {
   type: process.env.FIREBASE_TYPE,
   project_id: process.env.FIREBASE_PROJECT_ID,
@@ -25,7 +24,7 @@ const serviceAccount: any = {
 // Initialize Firebase Admin
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: "movie-booking-system-images.appspot.com" // your bucket
+  storageBucket: "hyper-tech-425e4.firebasestorage.app" 
 })
 
 const bucket = admin.storage().bucket()
